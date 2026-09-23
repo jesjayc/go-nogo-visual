@@ -8,7 +8,7 @@ let state = {
     aborted: false
 };
 
-const ABORT_CODE = "end42";
+const ABORT_CODE = "0001";
 let abortBuffer = "";
 let abortBufferTimer = null;
 
