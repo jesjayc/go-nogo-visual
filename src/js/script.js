@@ -140,11 +140,11 @@ function startCoolDown() {
     let timer = 10;
     btnOfficial.disabled = true;
     btnOfficial.style.opacity = "0.5";
-    btnOfficial.innerText = `AGUARDE (${timer}s)`;
+    btnOfficial.innerText = `AGUARDE (${timer})`;
 
     const countdown = setInterval(() => {
         timer--;
-        btnOfficial.innerText = `AGUARDE (${timer}s)`;
+        btnOfficial.innerText = `AGUARDE (${timer})`;
         
         if (timer <= 0) {
             clearInterval(countdown);
