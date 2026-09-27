@@ -9,7 +9,23 @@
 <body>
     <main class="container">
         
-        <section id="screen-intro" class="screen active">
+        <!-- Tela Inicial: Identificação -->
+        <section id="screen-name" class="screen active">
+            <div class="panel">
+                <h1 class="title" style="margin-bottom: 0;">Bem-vindo(a) ao Experimento</h1>
+                <h2 class="title" style="font-size: 1.8rem; margin-top: 10px; color: var(--text);">Go / No-Go Visual</h2>
+                <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-dim);">Para começar, por favor, digite seu ID ou nome.</p>
+                
+                <input type="text" id="participant-name-input" class="input-name" placeholder="Digite seu nome ou ID..." autocomplete="off">
+                
+                <div style="display: flex; justify-content: center; width: 100%;">
+                    <button id="btn-submit-name" class="btn-main">AVANÇAR PARA INSTRUÇÕES</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instruções -->
+        <section id="screen-intro" class="screen hidden">
             <div class="panel">
                 <h2 class="title">Treino - Go / No-Go Visual</h2>
                 
@@ -39,7 +55,7 @@
                 </div>
 
                 <div style="margin-top: 30px;">
-                    <button id="btn-trial" class="space-key-btn btn-full">ESTOU PRONTO (ESPAÇO)</button>
+                    <button id="btn-trial" class="btn-main">ESTOU PRONTO (ESPAÇO)</button>
                 </div>
             </div>
         </section>
@@ -50,7 +66,7 @@
                 <p style="margin-bottom: 20px; color: var(--text-dim);">Prepare-se para o teste oficial.</p>
                 
                 <p id="timer-msg" style="margin-bottom: 15px;">O botão será liberado em:</p>
-                <button id="btn-start-official" class="space-key-btn btn-full">AGUARDE</button>
+                <button id="btn-start-official" class="btn-main">AGUARDE</button>
             </div>
         </section>
 
@@ -65,17 +81,20 @@
                 <p style="margin-bottom: 15px;">Quanto tempo você acha que durou o teste oficial? (em minutos)</p>
                 
                 <input type="number" id="input-time-est" placeholder="Ex: 10">
-                <button id="btn-submit-est" class="space-key-btn btn-full" style="margin-top: 10px;">CONTINUAR</button>
+                <button id="btn-submit-est" class="btn-main" style="margin-top: 10px;">CONTINUAR</button>
             </div>
         </section>
 
+        <!-- Resultados (Envio Automático) -->
         <section id="screen-results" class="screen hidden">
             <div class="panel">
-                <h2 class="title">Teste Concluído</h2>
-                <p style="margin-bottom: 20px;">Clique no botão abaixo para baixar o arquivo CSV com os resultados.</p>
+                <h1 class="title" style="font-size: 2.25rem;">Você finalizou o teste!</h1>
+                <p id="email-status-text" style="margin-bottom: 2.5rem; font-weight: 600; color: var(--text-dim); font-size: 1.1rem;">⏳ Processando resultados...</p>
                 
-                <button id="btn-download-csv" class="space-key-btn btn-full">BAIXAR RESULTADOS (CSV)</button>
-                <button onclick="location.reload()" class="space-key-btn btn-full" style="margin-top:15px; background: #334155;">REINICIAR</button>
+                <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 400px; margin: 0 auto;">
+                    <button id="btn-copy-bkp" class="btn-secondary" style="margin: 0; width: 100%;">COPIAR DADOS BRUTOS (BKP)</button>
+                    <button id="btn-exit" class="btn-secondary" style="margin: 0; width: 100%; background: var(--border);">SAIR</button>
+                </div>
             </div>
         </section>
 

@@ -3,6 +3,7 @@ const SEQ_TRIAL = ["G", "G", "G", "N", "G", "G", "G", "N", "G", "G", "G", "N", "
 const SEQ_OFICIAL = ["G","G","G","G","N","G","N","G","G","N","G","G","G","G","G","G","N","G","G","G","G","N","G","G","G","G","G","G","N","G","G","G","G","G","N","G","G","G","N","G","G","G","N","G","N","N","G","N","G","G","G","G","G","N","G","G","G","G","G","G","G","G","G","N","G","G","N","N","N","G","G","G","N","G","G","G","N","G","G","G","N","G","G","N","G","G","G","G","G","N","G","G","G","G","N","N","G","N","G","G","N","N","G","G","G","G","G","G","N","G","G","G","N","G","G","G","G","G","N","G","N","G","N","G","G","N","N","G","G","G","G","G","G","G","G","N","G","G","N","G","G","N","G","N","N","G","G","G","G","G","N","G","G","G","G","G","N","G","G","G","N","G","G","G","N","G","G","G","G","N","G","G","G","G","G","G","N","G","N","N","G","G","N","G","N","G","G","N","G","G","G","G","G","G","N","N","N","G","G","G","G","G","N","G","N","G","G","N","G","G","G","G","N","N","G","G","G","G","G","G","N","G","G","G","G","G","N","G","G","G","G","G","G","N","G","G","N","G","G","G","G","G","G","N","G","G","N","G","G","G","G","N","G","G","G","G","G","G","N","G","N","N","G","G","G","G","G","N","N","G","G","N","G","G","G","G","G","N","G","G","G","G","G","G","N","N","G","G","G","G","G","G","G","G","N","G","G","G","G","G"];
 
 let state = {
+    participantId: '',
     idx: 0, logs: [], active: false, start: 0, reacted: false,
     seq: [], isOfficial: false, isRunning: false, lockNavigation: false,
     aborted: false
@@ -22,9 +23,45 @@ const show = id => {
         s.classList.remove('active');
     });
     const target = document.getElementById(id);
-    target.classList.remove('hidden');
-    target.classList.add('active');
+    if(target) {
+        target.classList.remove('hidden');
+        target.classList.add('active');
+    }
 };
+
+/* CONTROLE INICIAL E BOTÕES */
+document.addEventListener('DOMContentLoaded', () => {
+    const inputName = document.getElementById('participant-name-input');
+    const btnSubmitName = document.getElementById('btn-submit-name');
+
+    const submitName = () => {
+        const val = inputName.value.trim();
+        if (!val) {
+            alert("Por favor, digite seu nome ou ID para começar o teste.");
+            inputName.focus();
+            return;
+        }
+        state.participantId = val;
+        show('screen-intro');
+    };
+
+    if(btnSubmitName) btnSubmitName.addEventListener('click', submitName);
+    if(inputName) inputName.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitName();
+    });
+
+    document.getElementById('btn-trial').onclick = () => runTest(SEQ_TRIAL, false);
+    btnOfficial.onclick = () => runTest(SEQ_OFICIAL, true);
+    
+    document.getElementById('btn-submit-est').onclick = () => {
+        show('screen-results');
+        sendResultsByEmail();
+    };
+    
+    document.getElementById('btn-copy-bkp').onclick = copyToClipboard;
+    document.getElementById('btn-exit').onclick = () => location.reload();
+});
+
 
 const runTest = (seq, isOfficial) => {
     if (state.isRunning || state.lockNavigation) return;
@@ -64,11 +101,6 @@ window.addEventListener('keyup', (e) => {
     else if (post) runTest(SEQ_OFICIAL, true);
 });
 
-/* BOTÕES */
-document.getElementById('btn-trial').onclick = () => runTest(SEQ_TRIAL, false);
-btnOfficial.onclick = () => runTest(SEQ_OFICIAL, true);
-document.getElementById('btn-submit-est').onclick = () => { show('screen-results'); };
-document.getElementById('btn-download-csv').onclick = downloadCSV;
 
 function cycle() {
     if (state.aborted) return;
@@ -103,34 +135,9 @@ function finish() {
     if (state.isOfficial) {
         show('screen-estimation');
     } else {
-        startCoolDown(); // Inicia trava de 10s antes do oficial
+        startCoolDown(); 
     }
 }
-
-function abortTest() {
-    if (!state.isRunning) return;
-    state.aborted = true;
-    state.isRunning = false;
-    state.active = false;
-    area.style.display = 'none';
-    cross.style.display = 'none';
-    if (!state.logs.length) {
-        location.reload();
-        return;
-    }
-    show('screen-results');
-}
-
-window.addEventListener('keydown', (e) => {
-    if (e.key.length !== 1 || !/[a-z0-9]/i.test(e.key)) return;
-    abortBuffer = (abortBuffer + e.key.toLowerCase()).slice(-ABORT_CODE.length);
-    clearTimeout(abortBufferTimer);
-    abortBufferTimer = setTimeout(() => { abortBuffer = ""; }, 2000);
-    if (abortBuffer === ABORT_CODE) {
-        abortBuffer = "";
-        abortTest();
-    }
-});
 
 /* LÓGICA DA TRAVA DE 10 SEGUNDOS */
 function startCoolDown() {
@@ -151,12 +158,17 @@ function startCoolDown() {
             state.lockNavigation = false;
             btnOfficial.disabled = false;
             btnOfficial.style.opacity = "1";
-            btnOfficial.innerText = "ESPAÇO"; // Volta ao texto original
+            btnOfficial.innerText = "ESPAÇO"; 
         }
     }, 1000);
 }
 
-function downloadCSV() {
+// --- DISPARO DE EMAIL ---
+async function sendResultsByEmail() {
+    const statusText = document.getElementById('email-status-text');
+    if(!statusText) return;
+    statusText.textContent = '⏳ Enviando resultados para o servidor...';
+    
     const timeEstimation = document.getElementById('input-time-est')?.value || '';
     const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
     const rows = state.logs.map((l, i) => [
@@ -166,16 +178,80 @@ function downloadCSV() {
         l.status,
         timeEstimation
     ]);
-    const headerRow = ['campo', ...rows.map((_, i) => i + 1)];
-    const fieldRows = fields.map((field, fi) => [field, ...rows.map(row => row[fi])]);
-    const csv = [headerRow, ...fieldRows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `resultados-go-nogo-visual-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    
+    const headerRow = fields.join(';');
+    const csvContent = [headerRow, ...rows.map(r => r.join(';'))].join('\n');
+
+    try {
+        const response = await fetch('/api/enviar', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dadosCSV: csvContent,
+                participante: state.participantId
+            })
+        });
+
+        if (response.ok) {
+            statusText.innerHTML = '✅ Resultados salvos e enviados com sucesso!';
+            statusText.style.color = 'var(--cyan)';
+        } else {
+            throw new Error('Erro no servidor');
+        }
+    } catch (error) {
+        console.error("Erro:", error);
+        statusText.innerHTML = '❌ Erro no envio automático. Por favor, clique em "COPIAR DADOS BRUTOS".';
+        statusText.style.color = 'var(--orange)';
+    }
 }
+
+// --- BACKUP MANUAL ---
+function copyToClipboard() {
+    const timeEstimation = document.getElementById('input-time-est')?.value || '';
+    const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
+    const rows = state.logs.map((l, i) => [
+        i + 1,
+        l.type === 'G' ? 'Go' : 'No-Go',
+        l.rt ?? '',
+        l.status,
+        timeEstimation
+    ]);
+    
+    let clipText = fields.join('\t') + '\n';
+    rows.forEach(row => { clipText += row.join('\t') + '\n'; });
+    
+    navigator.clipboard.writeText(clipText).then(() => {
+        alert("Resultados copiados! Cole (Ctrl+V) no Excel.");
+    }).catch(err => {
+        alert("Erro ao copiar.");
+    });
+}
+
+// --- ABORTO DE SEGURANÇA (0001) ---
+function abortTest() {
+    if (!state.isRunning) return;
+    state.aborted = true;
+    state.isRunning = false;
+    state.active = false;
+    area.style.display = 'none';
+    cross.style.display = 'none';
+    
+    if (!state.logs.length) {
+        location.reload();
+        return;
+    }
+    
+    show('screen-results');
+    sendResultsByEmail();
+}
+
+window.addEventListener('keydown', (e) => {
+    if (e.key.length !== 1 || !/[a-z0-9]/i.test(e.key)) return;
+    abortBuffer = (abortBuffer + e.key.toLowerCase()).slice(-ABORT_CODE.length);
+    clearTimeout(abortBufferTimer);
+    abortBufferTimer = setTimeout(() => { abortBuffer = ""; }, 2000);
+    if (abortBuffer === ABORT_CODE) {
+        abortBuffer = "";
+        abortTest();
+    }
+});

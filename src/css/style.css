@@ -32,18 +32,16 @@ body {
     max-width: 800px;
     padding: 20px;
 }
+
 .screen {
     display: none;
     flex-direction: column;
     animation: fadeIn 0.3s ease;
     text-align: center;
 }
-.active {
-    display: flex;
-}
-.hidden {
-    display: none !important;
-}
+
+.active { display: flex; }
+.hidden { display: none !important; }
 
 .title {
     color: var(--cyan);
@@ -52,30 +50,14 @@ body {
     margin-bottom: 0.8rem;
     text-align: center;
 }
+
 .panel {
     background: var(--card);
     border: 1px solid var(--border);
-    padding: 1.5rem;
-    border-radius: 1rem;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
     margin-bottom: 0.6rem;
-}
-.instr-card {
-    background: var(--card);
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    border: 1px solid var(--border);
-}
-.instr-card h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-.instr-card p {
-    margin-bottom: 0;
-}
-.important-card h2 {
-    color: var(--cyan);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
 .circle-icon {
@@ -84,42 +66,21 @@ body {
     border-radius: 50%;
     flex-shrink: 0;
 }
-.circle-icon.go {
-    background: var(--blue);
-}
-.circle-icon.nogo {
-    background: var(--orange);
-}
-.strong-green {
-    color: var(--blue);
-}
-.strong-red {
-    color: var(--orange);
-}
-.strong-blue {
-    color: var(--cyan);
-}
+.circle-icon.go { background: var(--blue); }
+.circle-icon.nogo { background: var(--orange); }
 
 .info-list {
     list-style: none;
     font-size: 0.9rem;
 }
-.info-list li {
-    margin-bottom: 8px;
-}
-.key-badge {
-    background: #475569;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
+.info-list li { margin-bottom: 8px; }
 
 .rules-container {
     display: flex;
     gap: 15px;
     margin: 20px 0;
 }
+
 .rule {
     flex: 1;
     padding: 15px;
@@ -138,64 +99,110 @@ body {
     background: #7f1d1d33;
 }
 
-.btn-main {
-    background: var(--accent-blue);
-    color: white;
-    padding: 15px 40px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-    margin-top: 10px;
-    align-self: center;
-}
-.btn-main:hover {
-    filter: brightness(1.2);
-    transform: translateY(-2px);
+/* --- Input de Identificação --- */
+.input-name {
+    background-color: var(--border); 
+    border: 2px solid #475569;
+    color: var(--text);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 1.25rem;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 1.5rem auto;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: center;
+    display: block;
 }
 
-.space-key-btn {
-    display: inline-block;
+.input-name:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+}
+
+.input-name::placeholder { color: var(--text-dim); }
+
+input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 1rem;
+    margin: 10px auto 1.5rem auto;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2rem;
+    display: block;
+}
+
+/* --- Botões Padronizados --- */
+.btn-main {
+    display: block;
     background: #475569;
     color: var(--cyan);
     border: none;
-    padding: 12px 60px;
+    padding: 15px 60px;
     border-radius: 12px;
     font-weight: 800;
-    font-size: 1rem;
+    font-size: 1.1rem;
     letter-spacing: 2px;
     cursor: pointer;
-    box-shadow: 0 5px 0 #0f172a;
+    box-shadow: 0 5px 0 var(--bg);
     transition: all 0.1s ease;
     text-transform: uppercase;
-}
-.space-key-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 1px 0 #0f172a;
-}
-.btn-full {
     width: 100%;
+    max-width: 400px;
+    margin: 15px auto 0 auto;
+}
+
+.btn-main:active { 
+    transform: translateY(4px); 
+    box-shadow: 0 1px 0 var(--bg); 
+}
+
+.btn-main:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
     display: block;
+    background: var(--border);
+    color: var(--text);
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 0 var(--bg);
+    transition: all 0.1s ease;
+    width: 100%;
+    max-width: 400px;
+    margin: 15px auto 0 auto;
+}
+
+.btn-secondary:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 var(--bg);
 }
 
 /* TELA DE TESTE - CENTRALIZAÇÃO ABSOLUTA */
 .full-black-screen {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
     background: #000 !important;
     z-index: 9999;
 }
 
-#fixation-cross,
-#stimulus-area {
+#fixation-cross, #stimulus-area {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
 }
 
@@ -206,72 +213,18 @@ body {
     z-index: 10001;
     display: none;
 }
+
 #stimulus-area {
-    width: 180px;
-    height: 180px;
+    width: 180px; height: 180px;
     border-radius: 50%;
     z-index: 10000;
     display: none;
 }
 
-.stimulus-go {
-    background-color: var(--blue) !important;
-}
-.stimulus-nogo {
-    background-color: var(--orange) !important;
-}
-
-/* Relatório e Gráfico */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
-}
-.card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 10px;
-    border-radius: 12px;
-    text-align: center;
-}
-.card-label {
-    font-size: 0.6rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    display: block;
-}
-.card-value {
-    font-size: 1.2rem;
-    font-weight: 800;
-}
-.chart-wrapper {
-    width: 100%;
-    height: 200px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    position: relative;
-}
-#rt-chart {
-    width: 100%;
-    height: 100%;
-}
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    background: #0f172a;
-    border: 1px solid var(--border);
-    color: white;
-    border-radius: 8px;
-    text-align: center;
-}
+.stimulus-go { background-color: var(--blue) !important; }
+.stimulus-nogo { background-color: var(--orange) !important; }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
