@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-exit').onclick = () => location.reload();
 });
 
-
 const runTest = (seq, isOfficial) => {
     if (state.isRunning || state.lockNavigation) return;
     state.isRunning = true;
@@ -78,6 +77,9 @@ const runTest = (seq, isOfficial) => {
 
 /* REAÇÃO (PRESSIONAR) */
 window.addEventListener('keydown', (e) => {
+    // Evita apertar espaço sem querer enquanto digita o nome
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
     if (e.code !== 'Space') return;
     if (document.getElementById('screen-test').classList.contains('active')) {
         if (state.active && !state.reacted) {
@@ -92,6 +94,7 @@ window.addEventListener('keydown', (e) => {
 
 /* NAVEGAÇÃO (SOLTAR) */
 window.addEventListener('keyup', (e) => {
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     if (e.code !== 'Space' || state.isRunning || state.lockNavigation) return;
 
     const intro = document.getElementById('screen-intro').classList.contains('active');
@@ -100,7 +103,6 @@ window.addEventListener('keyup', (e) => {
     if (intro) runTest(SEQ_TRIAL, false);
     else if (post) runTest(SEQ_OFICIAL, true);
 });
-
 
 function cycle() {
     if (state.aborted) return;
@@ -158,7 +160,7 @@ function startCoolDown() {
             state.lockNavigation = false;
             btnOfficial.disabled = false;
             btnOfficial.style.opacity = "1";
-            btnOfficial.innerText = "ESPAÇO"; 
+            btnOfficial.innerText = "COMEÇAR ETAPA OFICIAL (ESPAÇO)"; 
         }
     }, 1000);
 }
@@ -179,8 +181,9 @@ async function sendResultsByEmail() {
         timeEstimation
     ]);
     
-    const headerRow = fields.join(';');
-    const csvContent = [headerRow, ...rows.map(r => r.join(';'))].join('\n');
+    const headerRow = ['campo', ...rows.map((_, i) => i + 1)];
+    const fieldRows = fields.map((field, fi) => [field, ...rows.map(row => row[fi])]);
+    const csvContent = [headerRow, ...fieldRows].map(row => row.join(',')).join('\n');
 
     try {
         const response = await fetch('/api/enviar', { 
@@ -246,6 +249,9 @@ function abortTest() {
 }
 
 window.addEventListener('keydown', (e) => {
+    // Ignora se estiver digitando o nome ou o tempo na estimativa
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
     if (e.key.length !== 1 || !/[a-z0-9]/i.test(e.key)) return;
     abortBuffer = (abortBuffer + e.key.toLowerCase()).slice(-ABORT_CODE.length);
     clearTimeout(abortBufferTimer);
