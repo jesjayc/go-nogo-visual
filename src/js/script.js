@@ -173,17 +173,18 @@ async function sendResultsByEmail() {
     
     const timeEstimation = document.getElementById('input-time-est')?.value || '';
     const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
+    
+    // Tabela Em Pé (Vertical) separada por Ponto-e-Vírgula
     const rows = state.logs.map((l, i) => [
         i + 1,
         l.type === 'G' ? 'Go' : 'No-Go',
         l.rt ?? '',
         l.status,
         timeEstimation
-    ]);
+    ].join(';'));
     
-    const headerRow = ['campo', ...rows.map((_, i) => i + 1)];
-    const fieldRows = fields.map((field, fi) => [field, ...rows.map(row => row[fi])]);
-    const csvContent = [headerRow, ...fieldRows].map(row => row.join(',')).join('\n');
+    const headerRow = fields.join(';');
+    const csvContent = [headerRow, ...rows].join('\n'); // Uma rodada embaixo da outra
 
     try {
         const response = await fetch('/api/enviar', { 
@@ -212,16 +213,18 @@ async function sendResultsByEmail() {
 function copyToClipboard() {
     const timeEstimation = document.getElementById('input-time-est')?.value || '';
     const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
+    
+    // Tabela Em Pé (Vertical) usando Tabulação para colar no Excel
     const rows = state.logs.map((l, i) => [
         i + 1,
         l.type === 'G' ? 'Go' : 'No-Go',
         l.rt ?? '',
         l.status,
         timeEstimation
-    ]);
+    ].join('\t'));
     
-    let clipText = fields.join('\t') + '\n';
-    rows.forEach(row => { clipText += row.join('\t') + '\n'; });
+    const headerRow = fields.join('\t');
+    const clipText = [headerRow, ...rows].join('\n'); // Uma rodada embaixo da outra
     
     navigator.clipboard.writeText(clipText).then(() => {
         alert("Resultados copiados! Cole (Ctrl+V) no Excel.");
