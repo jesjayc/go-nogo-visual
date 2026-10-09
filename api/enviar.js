@@ -27,7 +27,7 @@ export default async function handler(req, res) {
                 from: 'Pesquisa Go/No-Go VISUAL <onboarding@resend.dev>', 
                 to: ['bafeppgufcspa@gmail.com'],
                 subject: `Resultados do Experimento - ${participante}`,
-                html: `<p>Olá! Seguem em anexo os resultados de <strong>${participante}</strong> no Span Auditivo.</p>`,
+                html: `<p>Olá! Seguem em anexo os resultados de <strong>${participante}</strong> no Go/No-Go VISUAL.</p>`,
                 attachments: [
                     {
                         filename: `resultados-${participante}.csv`,
