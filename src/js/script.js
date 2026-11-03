@@ -52,14 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-trial').onclick = () => runTest(SEQ_TRIAL, false);
     btnOfficial.onclick = () => runTest(SEQ_OFICIAL, true);
-    
-    document.getElementById('btn-submit-est').onclick = () => {
-        show('screen-results');
-        sendResultsByEmail();
-    };
-    
-    document.getElementById('btn-copy-bkp').onclick = copyToClipboard;
-    document.getElementById('btn-exit').onclick = () => location.reload();
 });
 
 const runTest = (seq, isOfficial) => {
@@ -135,7 +127,8 @@ function finish() {
     state.active = false;
 
     if (state.isOfficial) {
-        show('screen-estimation');
+        show('screen-results');
+        sendResultsByEmail();
     } else {
         startCoolDown(); 
     }
@@ -160,7 +153,7 @@ function startCoolDown() {
             state.lockNavigation = false;
             btnOfficial.disabled = false;
             btnOfficial.style.opacity = "1";
-            btnOfficial.innerText = "COMEÇAR ETAPA OFICIAL (ESPAÇO)"; 
+            btnOfficial.innerText = "COMEÇAR TESTE (ESPAÇO)";
         }
     }, 1000);
 }
@@ -171,7 +164,7 @@ async function sendResultsByEmail() {
     if(!statusText) return;
     statusText.textContent = '⏳ Enviando resultados para o servidor...';
     
-    const timeEstimation = document.getElementById('input-time-est')?.value || '';
+    // Estimativa de tempo foi removida; a coluna segue vazia para manter o formato do CSV
     const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
     
     // Tabela Em Pé (Vertical) separada por Ponto-e-Vírgula
@@ -180,7 +173,7 @@ async function sendResultsByEmail() {
         l.type === 'G' ? 'Go' : 'No-Go',
         l.rt ?? '',
         l.status,
-        timeEstimation
+        ''
     ].join(';'));
     
     const headerRow = fields.join(';');
@@ -204,33 +197,9 @@ async function sendResultsByEmail() {
         }
     } catch (error) {
         console.error("Erro:", error);
-        statusText.innerHTML = '❌ Erro no envio automático. Por favor, clique em "COPIAR DADOS BRUTOS".';
+        statusText.innerHTML = '❌ Erro no envio automático. Por favor, avise o avaliador.';
         statusText.style.color = 'var(--orange)';
     }
-}
-
-// --- BACKUP MANUAL ---
-function copyToClipboard() {
-    const timeEstimation = document.getElementById('input-time-est')?.value || '';
-    const fields = ['indice', 'tipo_estimulo', 'tempo_reacao_ms', 'status', 'estimativa_tempo_min'];
-    
-    // Tabela Em Pé (Vertical) usando Tabulação para colar no Excel
-    const rows = state.logs.map((l, i) => [
-        i + 1,
-        l.type === 'G' ? 'Go' : 'No-Go',
-        l.rt ?? '',
-        l.status,
-        timeEstimation
-    ].join('\t'));
-    
-    const headerRow = fields.join('\t');
-    const clipText = [headerRow, ...rows].join('\n'); // Uma rodada embaixo da outra
-    
-    navigator.clipboard.writeText(clipText).then(() => {
-        alert("Resultados copiados! Cole (Ctrl+V) no Excel.");
-    }).catch(err => {
-        alert("Erro ao copiar.");
-    });
 }
 
 // --- ABORTO DE SEGURANÇA (0001) ---
@@ -252,7 +221,7 @@ function abortTest() {
 }
 
 window.addEventListener('keydown', (e) => {
-    // Ignora se estiver digitando o nome ou o tempo na estimativa
+    // Ignora se estiver digitando o nome
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
     if (e.key.length !== 1 || !/[a-z0-9]/i.test(e.key)) return;
